@@ -1,0 +1,37 @@
+{
+  "name": "pujanaik/user-discount",
+  "description": "User-level discounts",
+  "type": "library",
+  "license": "MIT",
+  "require": {
+    "php": ">=8.2",
+    "illuminate/support": "^11.0|^12.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "PujaNaik\\UserDiscount\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "PujaNaik\\UserDiscount\\UserDiscountServiceProvider"
+      ],
+      "aliases": {
+        "Discounts": "PujaNaik\\UserDiscount\\Facades\\Discounts"
+      }
+    }
+  },
+  "require-dev": {
+    "orchestra/testbench": "^9.15",
+    "pestphp/pest": "^3.8"
+  },
+  "scripts": {
+    "test": "pest -q"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}

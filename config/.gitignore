@@ -1,0 +1,29 @@
+# Dependency directories
+/vendor/
+/node_modules/
+
+# Composer lock file (optional for packages; keep only composer.json)
+composer.lock
+
+# Laravel package test artifacts
+.phpunit.result.cache
+.phpunit.cache
+/.phpunit.cache/
+/coverage/
+
+# IDE / Editor / OS
+/.idea/
+/vscode/
+/nbproject/
+/*.iml
+.DS_Store
+Thumbs.db
+
+# Logs / cache
+*.log
+/storage/
+.env
+.env.*
+
+# Build / dist
+/public/vendor/
