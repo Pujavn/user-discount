@@ -7,12 +7,14 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Discount extends Model
 {
-    protected $fillable = [
-        'name', 'slug', 'active', 'priority',
-        'percent', 'fixed_minor',
-        'starts_at', 'ends_at',
-        'per_user_cap', 'meta',
-    ];
+    protected $guarded = [];
+
+    // protected $fillable = [
+    //     'name', 'slug', 'active', 'priority',
+    //     'percent', 'fixed_minor',
+    //     'starts_at', 'ends_at',
+    //     'per_user_cap', 'meta',
+    // ];
 
     protected $casts = [
         'active'        => 'boolean',

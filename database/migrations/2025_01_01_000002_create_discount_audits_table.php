@@ -10,8 +10,8 @@ return new class extends Migration {
     {
         Schema::create('discount_audits', function (Blueprint $t) {
             $t->id();
-            $t->foreignId('discount_id')->constrained()->cascadeOnDelete();
-            $t->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $t->foreignId('discount_id')->constrained('discounts')->cascadeOnDelete();
+            $t->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $t->string('action');
             $t->string('application_key')->nullable();
             $t->bigInteger('amount_minor')->default(0);

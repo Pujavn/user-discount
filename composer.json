@@ -12,6 +12,11 @@
       "PujaNaik\\UserDiscount\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "PujaNaik\\UserDiscount\\Tests\\": "tests/"
+    }
+  },
   "extra": {
     "laravel": {
       "providers": [
@@ -23,7 +28,7 @@
     }
   },
   "require-dev": {
-    "orchestra/testbench": "^9.15",
+    "orchestra/testbench": "^9.0",
     "pestphp/pest": "^3.8"
   },
   "scripts": {

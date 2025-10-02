@@ -75,7 +75,19 @@ class DiscountManager
             $totalDiscount = 0;
 
             foreach ($eligible as $discount) {
-                // per-user usage cap
+                // 1) Idempotency FIRST: if this key was already applied, reuse that amount
+                $existing = DiscountAudit::where('discount_id', $discount->id)
+                    ->where('user_id', $user->id)
+                    ->where('action', 'applied')
+                    ->where('application_key', $applicationKey)
+                    ->first();
+
+                if ($existing) {
+                    $totalDiscount += (int) ($existing->amount_minor ?? 0);
+                    continue; // don't run cap or insert again
+                }
+
+                // 2) Per-user usage cap only for NEW applications
                 $usage = DiscountAudit::where('discount_id', $discount->id)
                     ->where('user_id', $user->id)
                     ->where('action', 'applied')
@@ -85,26 +97,10 @@ class DiscountManager
                     continue;
                 }
 
-                // idempotency check (fast path)
-                $exists = DiscountAudit::where('discount_id', $discount->id)
-                    ->where('user_id', $user->id)
-                    ->where('action', 'applied')
-                    ->where('application_key', $applicationKey)
-                    ->first();
-
-                if ($exists) {
-                    // if same key used, re-count its amount (idempotent)
-                    $totalDiscount += (int) ($exists->amount_minor ?? 0);
-                    continue;
-                }
-
-                // compute amount (percent or fixed), with safe caps
+                // 3) Compute and insert audit (unique constraint is final guard)
                 $amount = $this->computeAmount($discount, $subtotalMinor);
-                if ($amount <= 0) {
-                    continue;
-                }
+                if ($amount <= 0) continue;
 
-                // insert audit row; rely on unique index as final guard
                 try {
                     DiscountAudit::create([
                         'discount_id'     => $discount->id,
@@ -114,9 +110,7 @@ class DiscountManager
                         'amount_minor'    => $amount,
                     ]);
                 } catch (QueryException $e) {
-                    // if another concurrent txn inserted the same (unique) audit, treat as idempotent
                     if ($this->isDuplicateKey($e)) {
-                        // re-fetch the row and use its amount
                         $row = DiscountAudit::where('discount_id', $discount->id)
                             ->where('user_id', $user->id)
                             ->where('action', 'applied')
@@ -129,11 +123,7 @@ class DiscountManager
                 }
 
                 $totalDiscount += $amount;
-
                 DB::afterCommit(fn() => event(new DiscountApplied($user, $discount, $amount)));
-
-                // If you implement stacking/exclusive tags, you can break/continue here deterministically
-                // e.g., if (!$this->canStackFurther($discount)) break;
             }
 
             return $totalDiscount;

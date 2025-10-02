@@ -9,8 +9,8 @@ return new class extends Migration {
     public function up() {
         Schema::create('user_discounts', function (Blueprint $t) {
             $t->id();
-            $t->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $t->foreignId('discount_id')->constrained()->cascadeOnDelete();
+            $t->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $t->foreignId('discount_id')->constrained('discounts')->cascadeOnDelete();
             $t->unsignedInteger('usage_count')->default(0);
             $t->timestamp('assigned_at');
             $t->timestamp('revoked_at')->nullable();
